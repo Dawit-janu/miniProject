@@ -1,19 +1,18 @@
 import type { Metadata } from 'next';
-import './globals.css';
+import { Inter } from 'next/font/google';
+import './globals.css'
+
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'QA Reporting',
-  description: 'A QA Reporting app with dynamic test case management.',
+  title: 'QA Tracker',
+  description: 'QA Reporting & Progress Tracking',
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="id">
+      <body className={`${inter.className} bg-gray-50`}>{children}</body>
     </html>
   );
 }

@@ -9,29 +9,20 @@ export default function CreateProjectForm() {
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
-    setSuccess(null);
-
     const trimmedName = name.trim();
-    if (!trimmedName) {
-      setError('Nama proyek wajib diisi.');
-      return;
-    }
+    if (!trimmedName) { setError('Nama project wajib diisi.'); return; }
 
     setLoading(true);
-
     const response = await fetch('/api/projects', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: trimmedName, description: description.trim() || null }),
     });
-
     setLoading(false);
 
     if (!response.ok) {
@@ -42,47 +33,50 @@ export default function CreateProjectForm() {
 
     setName('');
     setDescription('');
-    setSuccess('Project berhasil dibuat!');
+    setSuccess(true);
+    setTimeout(() => setSuccess(false), 2000);
     router.refresh();
   }
 
   return (
-    <form className="mt-8 grid gap-4 rounded-3xl border border-slate-200 bg-slate-50 p-6" onSubmit={handleSubmit}>
-      <div className="grid gap-2">
-        <label className="text-sm font-medium text-slate-700" htmlFor="project-name">
-          Nama Project
+    <form onSubmit={handleSubmit} className="space-y-3">
+      <div>
+        <label className="block text-xs font-medium text-gray-600 mb-1.5" htmlFor="project-name">
+          Nama project <span className="text-red-400">*</span>
         </label>
         <input
           id="project-name"
+          type="text"
           value={name}
-          onChange={(event) => setName(event.target.value)}
-          className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-900 focus:ring-2 focus:ring-slate-200"
-          placeholder="Contoh: QA Reporting Dashboard"
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Contoh: QA Sprint 12"
+          className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-400 bg-white"
         />
       </div>
 
-      <div className="grid gap-2">
-        <label className="text-sm font-medium text-slate-700" htmlFor="project-description">
-          Deskripsi (opsional)
+      <div>
+        <label className="block text-xs font-medium text-gray-600 mb-1.5" htmlFor="project-desc">
+          Deskripsi <span className="text-gray-400 font-normal">(opsional)</span>
         </label>
         <textarea
-          id="project-description"
+          id="project-desc"
           value={description}
-          onChange={(event) => setDescription(event.target.value)}
-          className="min-h-[96px] rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-900 focus:ring-2 focus:ring-slate-200"
-          placeholder="Jelaskan tujuan proyek QA..."
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Jelaskan tujuan project QA ini..."
+          rows={3}
+          className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-400 resize-none bg-white"
         />
       </div>
 
-      {error ? <p className="text-sm text-red-600">{error}</p> : null}
-      {success ? <p className="text-sm text-green-600">{success}</p> : null}
+      {error && <p className="text-xs text-red-500">{error}</p>}
+      {success && <p className="text-xs text-green-600">Project berhasil dibuat!</p>}
 
       <button
         type="submit"
         disabled={loading}
-        className="inline-flex w-full items-center justify-center rounded-full bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:bg-slate-400"
+        className="w-full text-sm bg-blue-600 text-white rounded-lg px-4 py-2.5 font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
-        {loading ? 'Menyimpan...' : 'Create Project'}
+        {loading ? 'Menyimpan...' : 'Buat project'}
       </button>
     </form>
   );
