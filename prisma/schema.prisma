@@ -1,0 +1,65 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  name      String?
+  role      String    @default("qa")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  projects  Project[]
+}
+
+model Project {
+  id          String         @id @default(cuid())
+  name        String
+  description String?
+  owner       User?          @relation(fields: [ownerId], references: [id])
+  ownerId     String?
+  testCases   TestCase[]
+  runs        ExecutionRun[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+}
+
+model TestCase {
+  id          String          @id @default(cuid())
+  project     Project         @relation(fields: [projectId], references: [id])
+  projectId   String
+  title       String
+  status      String          @default("draft")
+  metadata    String
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  executions  ExecutionResult[]
+}
+
+model ExecutionRun {
+  id          String            @id @default(cuid())
+  project     Project           @relation(fields: [projectId], references: [id])
+  projectId   String
+  runName     String
+  executedAt  DateTime          @default(now())
+  results     ExecutionResult[]
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+}
+
+model ExecutionResult {
+  id           String         @id @default(cuid())
+  executionRun ExecutionRun   @relation(fields: [executionRunId], references: [id])
+  executionRunId String
+  testCase     TestCase      @relation(fields: [testCaseId], references: [id])
+  testCaseId   String
+  outcome      String
+  details      String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
